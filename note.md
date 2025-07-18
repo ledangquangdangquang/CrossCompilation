@@ -15,8 +15,8 @@
         scp -r /path/to/local/hello username@raspberrypi_ip:/path/to/remote/destination
         ```
 
-    > [!NOTE]
-    > `-r` is all file in folder hello.
+> [!NOTE]
+> `-r` is all file in folder hello.
 # SSH control 
 -   Ubutu user control raspberry pi os:
         ```
