@@ -403,5 +403,12 @@ rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/
 > * Each new project
 >     * Under **Run** section, on **X11 Forwarding** check **Forward to local display** and input :0 to the text field. 
 >     * Under **Environment** section, click **Details** to expand the environment option. Click **Add**, then on **Variable** column type **LD_LIBRARY_PATH**. On the **Value** column, type **:/usr/local/qt6/lib/**.
+>```
+>LD_LIBRARY_PATH
+>```
+>```
+>/usr/local/qt6/lib
+```
 
-
+---
+Once everything is set up, each time you build in Qt Creator, the build output will automatically appear in `/usr/local/bin` on the Raspberry Pi OS.
