@@ -9,7 +9,7 @@ Click the follow image to view this tutorial on Youtube.
 - Remote Debugging https://youtu.be/QWz-4R4kMIo
 - Localization https://youtu.be/JtTtzYZ_Nk0
 - Reference: https://youtube.com/playlist?list=PLw1hBEGKfRbmvt57e-JriZclgbSSHYzwH&feature=shared 
-> [!NOTE]
+> [!IMPORTANT]
 > * ***Only one line to copy for each step.***
 > * ***One terminal on the host to set up.***
 > * ***Plz be patient and calm.***
@@ -390,5 +390,9 @@ rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/
 ```
 ## Test HelloWorldQml
 ![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/f67fd349-3537-42f0-8e15-244f138a09d4)
+> [!IMPORTANT]
+> * Each new project
+>     * Under **Run** section, on **X11 Forwarding** check **Forward to local display** and input :0 to the text field. 
+>     * Under **Environment** section, click **Details** to expand the environment option. Click **Add**, then on **Variable** column type **LD_LIBRARY_PATH**. On the **Value** column, type **:/usr/local/qt6/lib/**.
 
 
