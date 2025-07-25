@@ -408,7 +408,7 @@ rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/
 >```
 >```
 >/usr/local/qt6/lib
-```
+>```
 
 ---
 Once everything is set up, each time you build in Qt Creator, the build output will automatically appear in `/usr/local/bin` on the Raspberry Pi OS.
