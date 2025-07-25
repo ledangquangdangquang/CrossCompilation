@@ -1,5 +1,5 @@
 # Cross compilation of Qt6.5.1 for RPI
-This page shows steps to compile Qt6.5.1 for RPI. Hope this page will help those stuck at following official tutorial. Before start, it is highly recommended that you use the same Ubuntu 22.04. At least not the older one. 
+This page shows steps to compile Qt6.5.1 for RPI. Hope this page will help those stuck at following official tutorial. Before start, it is highly recommended that you use the same **Ubuntu 22.04**. At least not the older one. 
 
 Click the follow image to view this tutorial on Youtube.
 
@@ -8,7 +8,11 @@ Click the follow image to view this tutorial on Youtube.
 - Cross Compilation https://youtu.be/8kpHgNKPooc
 - Remote Debugging https://youtu.be/QWz-4R4kMIo
 - Localization https://youtu.be/JtTtzYZ_Nk0
-
+- Reference: https://youtube.com/playlist?list=PLw1hBEGKfRbmvt57e-JriZclgbSSHYzwH&feature=shared 
+> [!NOTE]
+> Only one line to copy for each step.
+> One terminal on the host to set up.
+> Plz be patient and calm.
 # Prepare RPI
 Install the lastest 64bit Raspberry Pi OS with desktop and update the system.
 Check firmware:
