@@ -1,772 +1,390 @@
-[![Youtube video link](https://img.youtube.com/vi/oWpomXg9yj0/0.jpg)](//www.youtube.com/watch?v=oWpomXg9yj0?t=0s "quang dikme")
+# Cross compilation of Qt6.5.1 for RPI
+This page shows steps to compile Qt6.5.1 for RPI. Hope this page will help those stuck at following official tutorial. Before start, it is highly recommended that you use the same Ubuntu 22.04. At least not the older one. 
 
-# Prepare Raspberry pi 4
-My raspberry pi image is : 2022-04-04-raspios-bullseye-armhf
+Click the follow image to view this tutorial on Youtube.
 
-When you update the your raspberry pi, firmware version can be different.
-If you want, you can make it same with mine.
-For this instructions, mine firmware version:
-```bash
-quang@raspberrypi:~ $ cat /boot/.firmware_revision
-6db8c1cdd3da2f070866d2149c956ce86a4ccdd5
+[![Youtube video link](https://i.ytimg.com/vi/8kpHgNKPooc/hqdefault.jpg)](//youtu.be/8kpHgNKPooc "Youtube Video")
+
+- Cross Compilation https://youtu.be/8kpHgNKPooc
+- Remote Debugging https://youtu.be/QWz-4R4kMIo
+- Localization https://youtu.be/JtTtzYZ_Nk0
+
+# Prepare RPI
+Install the lastest 64bit Raspberry Pi OS with desktop and update the system.
+Check firmware:
 ```
-> [!NOTE]
-> Cap nhat firmware
-> `sudo rpi-update 6db8c1cdd3da2f070866d2149c956ce86a4ccdd5`
-
-To do that instead of empty rpi-update(no argument), just run rpi-update 6db8c1cdd3da2f070866d2149c956ce86a4ccdd5
-But it is up to you.
-
-Update raspberry pi
+cat /boot/.firmware_revision
+```
 ```bash
-$ sudo apt update
-$ sudo apt full-upgrade
-$ sudo reboot
-$ sudo rpi-update 6db8c1cdd3da2f070866d2149c956ce86a4ccdd5
-$ sudo reboot
+sudo apt update
+sudo apt full-upgrade
+sudo reboot
+sudo rpi-update 6db8c1cdd3da2f070866d2149c956ce86a4ccdd5
+sudo reboot
 ```
 
-Install the dependencies
-
-```bash
-$ sudo apt-get install -y libboost1.71-all-dev libudev-dev libinput-dev libts-dev \
-libmtdev-dev libjpeg-dev libfontconfig1-dev libssl-dev libdbus-1-dev libglib2.0-dev \
-libxkbcommon-dev libegl1-mesa-dev libgbm-dev libgles2-mesa-dev mesa-common-dev \
-libasound2-dev libpulse-dev gstreamer1.0-omx libgstreamer1.0-dev \
-libgstreamer-plugins-base1.0-dev  gstreamer1.0-alsa libvpx-dev libsrtp0-dev libsnappy-dev \
-libnss3-dev "^libxcb.*" flex bison libxslt-dev ruby gperf libbz2-dev libcups2-dev \
-libatkmm-1.6-dev libxi6 libxcomposite1 libfreetype6-dev libicu-dev libsqlite3-dev libxslt1-dev
-
-$ sudo apt-get install -y libavcodec-dev libavformat-dev libswscale-dev \
-libx11-dev freetds-dev libsqlite0-dev libpq-dev libiodbc2-dev firebird-dev \
-libgst-dev libxext-dev libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev \
-libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev \
-libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync-dev libxcb-render-util0 \
-libxcb-render-util0-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev \
-libxcb-glx0-dev libxi-dev libdrm-dev libxcb-xinerama0 libxcb-xinerama0-dev libatspi2.0-dev \
-libxcursor-dev libxcomposite-dev libxdamage-dev libxss-dev libxtst-dev libpci-dev libcap-dev \
-libxrandr-dev libdirectfb-dev libaudio-dev libxkbcommon-x11-dev
-
-sudo apt remove libzstd-dev libharfbuzz-bin libharfbuzz-dev
+Install necessary packages.
 ```
-Create a directory for binaries.Give enough permission for your user.
-
-```bash
-$ sudo mkdir /usr/local/qt6rpi
-$ sudo chown quang:quang /usr/local/qt6rpi
+sudo apt-get install libboost-all-dev libudev-dev libinput-dev libts-dev libmtdev-dev libjpeg-dev libfontconfig1-dev libssl-dev libdbus-1-dev libglib2.0-dev libxkbcommon-dev libegl1-mesa-dev libgbm-dev libgles2-mesa-dev mesa-common-dev libasound2-dev libpulse-dev gstreamer1.0-omx libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev  gstreamer1.0-alsa libvpx-dev libsrtp2-dev libsnappy-dev libnss3-dev "^libxcb.*" flex bison libxslt-dev ruby gperf libbz2-dev libcups2-dev libatkmm-1.6-dev libxi6 libxcomposite1 libfreetype6-dev libicu-dev libsqlite3-dev libxslt1-dev 
 ```
-
-# Prepare Ubuntu
-Ubuntu version is 22.04 ( ubuntu-22.04-desktop-amd64 ). 
-```bash
-$ quang@quang:~/qtCrossExample$ lsb_release -a
-No LSB modules are available.
-Distributor ID:	Ubuntu
-Description:	Ubuntu 22.04 LTS
-Release:	22.04
-Codename:	jammy
-$ quang@quang:~/qtCrossExample$ uname -a
-Linux quang 5.15.0-27-generic #28-Ubuntu SMP Thu Apr 14 04:55:28 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
 ```
-
-Update the ubuntu
-```bash
-$ sudo apt-get update
-$ sudo apt-get upgrade
+sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libx11-dev freetds-dev libsqlite3-dev libpq-dev libiodbc2-dev firebird-dev libxext-dev libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-glx0-dev libxi-dev libdrm-dev libxcb-xinerama0 libxcb-xinerama0-dev libatspi2.0-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxss-dev libxtst-dev libpci-dev libcap-dev libxrandr-dev libdirectfb-dev libaudio-dev libxkbcommon-x11-dev gdbserver
 ```
-Install dependencies
-```bash
-$ sudo apt-get install make build-essential libclang-dev ninja-build gcc git bison \
-python3 gperf pkg-config libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev \
-libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev \
-libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev \
-libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev \
-libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev \
-libatspi2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev
+Make a folder for qt6 installation.
 ```
-
-## Build CMake from source
-During compilation I see a lot of dependency problems because of cmake. Then I simply compiled it from source.
-Latest version is better. My version is:
-```bash
-quang@quang: $ cmake --version
-cmake version 3.23.20220428-g90d5d42
-
-CMake suite maintained and supported by Kitware (kitware.com/cmake).
+sudo mkdir /usr/local/qt6
 ```
-Compilation of CMake is easy:
-```bash
-$ sudo apt install libssl-dev
-$ git clone https://github.com/Kitware/CMake.git
-$ cd CMake
-$ ./bootstrap && make && sudo make install
+Grant full access to the fold used for the deployment from Qt Creator. 
 ```
-
-## Build the qt6 for host
-Qt6 is different then Qt5. If you checked my old videos, you can see that, I installed qt5-default on target. But not anymore.
-We need to build Qt6 on the host then we will pass the path of installation to the cmake which is used to cross compile.
-As I see host version should be same with the cross one.
-All the directories are in the home directory except toolchain. ( so check paths about it. )
-```bash
-$ cd ~
-$ mkdir qt
-$ cd ~/qt
-$ wget https://download.qt.io/archive/qt/6.3/6.3.0/submodules/qtbase-everywhere-src-6.3.0.tar.xz
-$ mkdir qt6HostBuild
-$ cd !$
-$ tar xf ../qtbase-everywhere-src-6.3.0.tar.xz
-$ cd qtbase-everywhere-src-6.3.0
-$ cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DINPUT_opengl=es2 -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/home/quang/qt/qt6Host
-$ cmake --build . --parallel 4
-$ cmake --install .
+sudo chmod 777 /usr/local/bin
 ```
-Test the host qt6
+Remember versions of gcc(10.2.1), ld(2.35.2) and ldd(2.31). Source code of the same version should be downloaded to build cross compiler later.
 
-```bash
-$ cd $HOME
-$ mkdir QtHostExample
-$ cd !$
- 
-$ cat<<EOF > main.cpp 
-#include <QCoreApplication>
-#include <QDebug>
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/ba2f1848-0c5c-426d-8d3f-1420931637bd)
 
-int main(int argc, char *argv[])
-{
-    QCoreApplication a(argc, argv);
+Append following piece of code to the end of ~/.bashrc.
+```
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/qt6/lib/
+```
+Update the changes.
+```
+source ~/.bashrc
+```
+# Prepare host
+Create a virtual machine for Ubuntu 22.04.2 and then update the system.
+```
+sudo apt update
+sudo apt upgrade
+```
+Install necessary packages.
+```
+sudo apt-get install make build-essential libclang-dev ninja-build gcc git bison python3 gperf pkg-config libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev build-essential gawk git texinfo bison file wget libssl-dev gdbserver gdb-multiarch libxcb-cursor-dev
+```
+## Build the lastest CMake from source
+```
+cd ~
+git clone https://github.com/Kitware/CMake.git
+cd CMake
+./bootstrap && make -j8&& sudo make install
+```
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/e11f4e6c-a4c0-4f03-86dc-b6d463bab80b)
 
-    qDebug()<<"Hello world";
-    return a.exec();
-}
-EOF
- 
-$ cat<<EOF > CMakeLists.txt
-cmake_minimum_required(VERSION 3.5)
+Folder CMake is not need any more. You can delete it.
 
-project(HelloQt6 LANGUAGES CXX)
-
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(Qt6Core)
-
-add_executable(HelloQt6 main.cpp)
-
-target_link_libraries(HelloQt6 Qt6::Core)
-EOF
-
-/home/quang/qt/qt6Host/bin/qt-cmake
-cmake --build .
-./HelloQt6
+## Build gcc as a cross compiler
+Download necessary source code. **You should modify the following commands to your needs.**
+For the time I make this page, they are:
+* gcc 10.3.0(gcc version 10.2.1 does not exist and use the closest one)
+* binutils 2.35.2(ld version)
+* glibc 2.31(ldd version)
+```
+cd ~
+mkdir gcc_all && cd gcc_all
+wget https://ftpmirror.gnu.org/binutils/binutils-2.35.2.tar.bz2
+wget https://ftpmirror.gnu.org/glibc/glibc-2.31.tar.bz2
+wget https://ftpmirror.gnu.org/gcc/gcc-10.3.0/gcc-10.3.0.tar.gz
+git clone --depth=1 https://github.com/raspberrypi/linux
+tar xf binutils-2.35.2.tar.bz2
+tar xf glibc-2.31.tar.bz2
+tar xf gcc-10.3.0.tar.gz
+rm *.tar.*
+cd gcc-10.3.0
+contrib/download_prerequisites
+```
+Make a folder for the compiler installation.
+```
+sudo mkdir -p /opt/cross-pi-gcc
+sudo chown $USER /opt/cross-pi-gcc
+export PATH=/opt/cross-pi-gcc/bin:$PATH
+```
+Copy the kernel headers in the above folder.
+```
+cd ~/gcc_all
+cd linux
+KERNEL=kernel7
+make ARCH=arm64 INSTALL_HDR_PATH=/opt/cross-pi-gcc/aarch64-linux-gnu headers_install
+```
+Build Binutils. **You should modify the following commands to your needs.**
+```
+cd ~/gcc_all
+mkdir build-binutils && cd build-binutils
+../binutils-2.35.2/configure --prefix=/opt/cross-pi-gcc --target=aarch64-linux-gnu --with-arch=armv8 --disable-multilib
+make -j 8
+make install
+```
+Edit gcc-10.3.0/libsanitizer/asan/asan_linux.cpp. Add following piece of code.
+```
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
 ```
 
-Get toolchain
-toolchain must be extracted under /opt/rpi/
-
-```bash
-$ sudo mkdir /opt/rpi
-$ cd !$
-$ sudo wget www.ulasdikme.com/yedek/rpi-gcc-8.3.0_linux.tar.xz
-<!-- http://www.ulasdikme.com/yedek/rpi-gcc-8.3.0_linux.tar.xz -->
-$ sudo tar xf rpi-gcc-8.3.0_linux.tar.xz 
-
-
-quang@quang:/opt/rpi$ ls -l | grep rpi-gcc-8.3.0
-drwxr-xr-x 8 quang quang      4096 sep  4  2019 rpi-gcc-8.3.0
--rw-r--r-- 1 root root 200056952 apr 29 12:47 rpi-gcc-8.3.0_linux.tar.xz
-
+Do a partial build of gcc. **You should modify the following commands to your needs.**
 ```
-
-Install sysroot from raspberry pi target device. ( be sure it is in the same network. Just ping )
-Update the user name and the ip adress of yours.
-```bash
-$ cd $HOME/qt
-$ mkdir rpi-sdk 
-$ cd !$
-
-$ mkdir sysroot sysroot/usr sysroot/opt
-$ rsync -avz --rsync-path="sudo rsync" quang@192.168.30.44:/usr/include sysroot/usr
-$ rsync -avz --rsync-path="sudo rsync" quang@192.168.30.44:/lib sysroot
-$ rsync -avz --rsync-path="sudo rsync" quang@192.168.30.44:/usr/lib sysroot/usr 
-$ rsync -avz --rsync-path="sudo rsync" quang@192.168.30.44:/opt/vc sysroot/opt
-
-$ wget https://raw.githubusercontent.com/riscv/riscv-poky/master/scripts/sysroot-relativelinks.py
-$ chmod +x sysroot-relativelinks.py 
-$ python3 sysroot-relativelinks.py sysroot
+cd ~/gcc_all
+mkdir build-gcc && cd build-gcc
+../gcc-10.3.0/configure --prefix=/opt/cross-pi-gcc --target=aarch64-linux-gnu --enable-languages=c,c++ --disable-multilib
+make -j8 all-gcc
+make install-gcc
 ```
-
-## Compile the Qt6.3.0
-lets create qt-cross directory where we can compile qt.
-
-```bash
-$ cd ..
-$ mkdir qt-cross
-$ cd !$
+Partially build Glibc. **You should modify the following commands to your needs.**
 ```
-Because of cmake we need a toolcain.cmake file(name can be different) which is used to give the some paths for sysroot and compiler flags. This can be different according to your need. This file will be passed to cmake as an argument. 
-Update the sysroot path TARGET_SYSROOT with user name. Cross compiler path must be same. Create a toolchain.cmake file and copy the content below in it.
-toolchain.cmake :
-```bash
-cmake_minimum_required(VERSION 3.16)
+cd ~/gcc_all
+mkdir build-glibc && cd build-glibc
+../glibc-2.31/configure --prefix=/opt/cross-pi-gcc/aarch64-linux-gnu --build=$MACHTYPE --host=aarch64-linux-gnu --target=aarch64-linux-gnu --with-headers=/opt/cross-pi-gcc/aarch64-linux-gnu/include --disable-multilib libc_cv_forced_unwind=yes
+make install-bootstrap-headers=yes install-headers
+make -j8 csu/subdir_lib
+install csu/crt1.o csu/crti.o csu/crtn.o /opt/cross-pi-gcc/aarch64-linux-gnu/lib
+aarch64-linux-gnu-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o /opt/cross-pi-gcc/aarch64-linux-gnu/lib/libc.so
+touch /opt/cross-pi-gcc/aarch64-linux-gnu/include/gnu/stubs.h
+```
+Back to gcc.
+```
+cd ~/gcc_all/build-gcc
+make -j8 all-target-libgcc
+make install-target-libgcc
+```
+Finish building glibc.
+```
+cd ~/gcc_all/build-glibc
+make -j8
+make install
+```
+Finish building gcc.
+```
+cd ~/gcc_all/build-gcc
+make -j8
+make install
+```
+At this point, we have a full cross compiler toolchain with gcc. Folder gcc_all is not need any more. You can delete it.
+
+## Building Qt6
+Make folders for sysroot and qt6.
+```
+cd ~
+mkdir rpi-sysroot rpi-sysroot/usr rpi-sysroot/opt
+mkdir qt6 qt6/host qt6/pi qt6/host-build qt6/pi-build qt6/src
+```
+Download QtBase source code
+```
+cd ~/qt6/src
+wget https://download.qt.io/official_releases/qt/6.5/6.5.1/submodules/qtbase-everywhere-src-6.5.1.tar.xz
+tar xf qtbase-everywhere-src-6.5.1.tar.xz
+```
+### Build Qt6 for host
+```
+cd $HOME/qt6/host-build/
+cmake ../src/qtbase-everywhere-src-6.5.1/ -GNinja -DCMAKE_BUILD_TYPE=Release -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=$HOME/qt6/host
+cmake --build . --parallel 8
+cmake --install .
+```
+Binaries will be in $HOME/qt6/host
+### Build Qt6 for rpi
+copy and paste a few folders from rpi using rsync through SSH. **You should modify the following commands to your needs.**
+```
+cd ~
+rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/include rpi-sysroot/usr
+rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/lib rpi-sysroot
+rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/lib rpi-sysroot/usr 
+rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/opt/vc rpi-sysroot/opt
+```
+Create a file named toolchain.cmake in $HOME/qt6.
+```
+cmake_minimum_required(VERSION 3.18)
 include_guard(GLOBAL)
 
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
-set(TARGET_SYSROOT /home/quang/qt/rpi-sdk/sysroot)
-
-set(CROSS_COMPILER /opt/rpi/rpi-gcc-8.3.0/bin/arm-linux-gnueabihf)
-
+# You should change location of sysroot to your needs.
+set(TARGET_SYSROOT /home/quang/rpi-sysroot)
+set(TARGET_ARCHITECTURE aarch64-linux-gnu)
 set(CMAKE_SYSROOT ${TARGET_SYSROOT})
 
-set(CMAKE_C_COMPILER ${CROSS_COMPILER}-gcc)
-set(CMAKE_CXX_COMPILER ${CROSS_COMPILER}-g++)
+set(ENV{PKG_CONFIG_PATH} $PKG_CONFIG_PATH:${CMAKE_SYSROOT}/usr/lib/${TARGET_ARCHITECTURE}/pkgconfig)
+set(ENV{PKG_CONFIG_LIBDIR} /usr/lib/pkgconfig:/usr/share/pkgconfig/:${TARGET_SYSROOT}/usr/lib/${TARGET_ARCHITECTURE}/pkgconfig:${TARGET_SYSROOT}/usr/lib/pkgconfig)
+set(ENV{PKG_CONFIG_SYSROOT_DIR} ${CMAKE_SYSROOT})
 
-set(CMAKE_LIBRARY_ARCHITECTURE arm-linux-gnueabihf)
+set(CMAKE_C_COMPILER /opt/cross-pi-gcc/bin/${TARGET_ARCHITECTURE}-gcc)
+set(CMAKE_CXX_COMPILER /opt/cross-pi-gcc/bin/${TARGET_ARCHITECTURE}-g++)
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fPIC -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -isystem=/usr/include -isystem=/usr/local/include -isystem=/usr/include/${TARGET_ARCHITECTURE}")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
 
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-
-set(QT_COMPILER_FLAGS "-march=armv8-a -mfpu=crypto-neon-fp-armv8 -mtune=cortex-a72 -mfloat-abi=hard")
+set(QT_COMPILER_FLAGS "-march=armv8-a")
 set(QT_COMPILER_FLAGS_RELEASE "-O2 -pipe")
-set(QT_LINKER_FLAGS "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed")
+set(QT_LINKER_FLAGS "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -Wl,-rpath-link=${TARGET_SYSROOT}/usr/lib/${TARGET_ARCHITECTURE} -Wl,-rpath-link=$HOME/qt6/pi/lib")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_BUILD_RPATH ${TARGET_SYSROOT})
 
-set(CMAKE_THREAD_LIBS_INIT "-lpthread")
-set(CMAKE_HAVE_THREADS_LIBRARY 1)
-set(CMAKE_USE_WIN32_THREADS_INIT 0)
-set(CMAKE_USE_PTHREADS_INIT 1)
-set(THREADS_PREFER_PTHREAD_FLAG ON)
+include(CMakeInitializeConfigs)
+
+function(cmake_initialize_per_config_variable _PREFIX _DOCSTRING)
+  if (_PREFIX MATCHES "CMAKE_(C|CXX|ASM)_FLAGS")
+    set(CMAKE_${CMAKE_MATCH_1}_FLAGS_INIT "${QT_COMPILER_FLAGS}")
+        
+    foreach (config DEBUG RELEASE MINSIZEREL RELWITHDEBINFO)
+      if (DEFINED QT_COMPILER_FLAGS_${config})
+        set(CMAKE_${CMAKE_MATCH_1}_FLAGS_${config}_INIT "${QT_COMPILER_FLAGS_${config}}")
+      endif()
+    endforeach()
+  endif()
+
+
+  if (_PREFIX MATCHES "CMAKE_(SHARED|MODULE|EXE)_LINKER_FLAGS")
+    foreach (config SHARED MODULE EXE)
+      set(CMAKE_${config}_LINKER_FLAGS_INIT "${QT_LINKER_FLAGS}")
+    endforeach()
+  endif()
+
+  _cmake_initialize_per_config_variable(${ARGV})
+endfunction()
+
+set(XCB_PATH_VARIABLE ${TARGET_SYSROOT})
+
+set(GL_INC_DIR ${TARGET_SYSROOT}/usr/include)
+set(GL_LIB_DIR ${TARGET_SYSROOT}:${TARGET_SYSROOT}/usr/lib/${TARGET_ARCHITECTURE}/:${TARGET_SYSROOT}/usr:${TARGET_SYSROOT}/usr/lib)
+
+set(EGL_INCLUDE_DIR ${GL_INC_DIR})
+set(EGL_LIBRARY ${XCB_PATH_VARIABLE}/usr/lib/${TARGET_ARCHITECTURE}/libEGL.so)
+
+set(OPENGL_INCLUDE_DIR ${GL_INC_DIR})
+set(OPENGL_opengl_LIBRARY ${XCB_PATH_VARIABLE}/usr/lib/${TARGET_ARCHITECTURE}/libOpenGL.so)
+
+set(GLESv2_INCLUDE_DIR ${GL_INC_DIR})
+set(GLIB_LIBRARY ${XCB_PATH_VARIABLE}/usr/lib/${TARGET_ARCHITECTURE}/libGLESv2.so)
+
+set(GLESv2_INCLUDE_DIR ${GL_INC_DIR})
+set(GLESv2_LIBRARY ${XCB_PATH_VARIABLE}/usr/lib/${TARGET_ARCHITECTURE}/libGLESv2.so)
+
+set(gbm_INCLUDE_DIR ${GL_INC_DIR})
+set(gbm_LIBRARY ${XCB_PATH_VARIABLE}/usr/lib/${TARGET_ARCHITECTURE}/libgbm.so)
+
+set(Libdrm_INCLUDE_DIR ${GL_INC_DIR})
+set(Libdrm_LIBRARY ${XCB_PATH_VARIABLE}/usr/lib/${TARGET_ARCHITECTURE}/libdrm.so)
+
+set(XCB_XCB_INCLUDE_DIR ${GL_INC_DIR})
+set(XCB_XCB_LIBRARY ${XCB_PATH_VARIABLE}/usr/lib/${TARGET_ARCHITECTURE}/libxcb.so)
+
+list(APPEND CMAKE_LIBRARY_PATH ${CMAKE_SYSROOT}/usr/lib/${TARGET_ARCHITECTURE})
+list(APPEND CMAKE_PREFIX_PATH "/usr/lib/${TARGET_ARCHITECTURE}/cmake")
 ```
-We can use the same qtbase src tar file for cross compilation. If you check closely, there are DQT_HOST_PATH, DCMAKE_STAGING_PREFIX, DCMAKE_INSTALL_PREFIX, DCMAKE_PREFIX_PATH, DCMAKE_TOOLCHAIN_FILE paths. Please update these according to yours (Change user name). 
-
-```bash
-$ tar xf ../qtbase-everywhere-src-6.3.0.tar.xz
-
-$cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DQT_FEATURE_eglfs_egldevice=ON -DQT_FEATURE_eglfs_gbm=ON \
--DQT_BUILD_TOOLS_WHEN_CROSSCOMPILING=ON  -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF \
--DQT_HOST_PATH=/home/quang/qt/qt6Host -DCMAKE_STAGING_PREFIX=/home/quang/qt/qt6rpi \
--DCMAKE_INSTALL_PREFIX=/home/quang/qt/qt6crosspi -DCMAKE_PREFIX_PATH=/home/quang/qt/rpi-sdk/sysroot/usr/lib/ \
--DCMAKE_TOOLCHAIN_FILE=/home/quang/qt/qt-cross/toolchain.cmake /home/quang/qt/qt-cross/qtbase-everywhere-src-6.3.0/
+Fix absolute symbolic links
 ```
-After this you should see like this (If it is configured successfully):
-(If the configuration result is not in the output check the config.summary file in the same directory. It should be exist after configuration. It is explained in the video.)
-
-
-```bash
-
-Configure summary:
-
-Building for: linux-g++ (arm, CPU features: )
-Compiler: gcc 8.3.0
-Build options:
-  Mode ................................... release
-  Optimize release build for size ........ no
-  Fully optimize release builds (-O3) .... no
-  Building shared libraries .............. yes
-  Using C standard ....................... C11
-  Using C++ standard ..................... C++17
-  Using ccache ........................... no
-  Using new DTAGS ........................ yes
-  Relocatable ............................ yes
-  Using precompiled headers .............. yes
-  Using LTCG ............................. no
-  Target compiler supports:
-    Extensions ........................... <none>
-  Sanitizers:
-    Addresses ............................ no
-    Threads .............................. no
-    Memory ............................... no
-    Fuzzer (instrumentation only) ........ no
-    Undefined ............................ no
-  Build parts ............................ libs tools
-Qt modules and options:
-  Qt Concurrent .......................... yes
-  Qt D-Bus ............................... yes
-  Qt D-Bus directly linked to libdbus .... yes
-  Qt Gui ................................. yes
-  Qt Network ............................. yes
-  Qt PrintSupport ........................ yes
-  Qt Sql ................................. yes
-  Qt Testlib ............................. yes
-  Qt Widgets ............................. yes
-  Qt Xml ................................. yes
-Support enabled for:
-  Using pkg-config ....................... yes
-  udev ................................... no
-  Using system zlib ...................... yes
-  Zstandard support ...................... no
-  Thread support ......................... yes
-Common build options:
-  Linker can resolve circular dependencies  yes
-Qt Core:
-  backtrace .............................. yes
-  DoubleConversion ....................... yes
-    Using system DoubleConversion ........ no
-  GLib ................................... yes
-  ICU .................................... yes
-  Using system libb2 ..................... no
-  Built-in copy of the MIME database ..... yes
-  cpp/winrt base ......................... no
-  Tracing backend ........................ <none>
-  Logging backends:
-    journald ............................. no
-    syslog ............................... no
-    slog2 ................................ no
-  PCRE2 .................................. yes
-    Using system PCRE2 ................... yes
-  CLONE_PIDFD support in forkfd .......... yes
-Qt Sql:
-  SQL item models ........................ yes
-Qt Network:
-  getifaddrs() ........................... yes
-  IPv6 ifname ............................ yes
-  libproxy ............................... no
-  Linux AF_NETLINK ....................... yes
-  OpenSSL ................................ yes
-    Qt directly linked to OpenSSL ........ no
-  OpenSSL 1.1 ............................ yes
-  DTLS ................................... yes
-  OCSP-stapling .......................... yes
-  SCTP ................................... no
-  Use system proxies ..................... yes
-  GSSAPI ................................. no
-  Brotli Decompression Support ........... yes
-Qt Gui:
-  Accessibility .......................... yes
-  FreeType ............................... yes
-    Using system FreeType ................ yes
-  HarfBuzz ............................... yes
-    Using system HarfBuzz ................ no
-  Fontconfig ............................. yes
-  Image formats:
-    GIF .................................. yes
-    ICO .................................. yes
-    JPEG ................................. yes
-      Using system libjpeg ............... yes
-    PNG .................................. yes
-      Using system libpng ................ yes
-  Text formats:
-    HtmlParser ........................... yes
-    CssParser ............................ yes
-    OdfWriter ............................ yes
-    MarkdownReader ....................... yes
-      Using system libmd4c ............... no
-    MarkdownWriter ....................... yes
-  EGL .................................... yes
-  OpenVG ................................. no
-  OpenGL:
-    Desktop OpenGL ....................... yes
-    OpenGL ES 2.0 ........................ no
-    OpenGL ES 3.0 ........................ no
-    OpenGL ES 3.1 ........................ no
-    OpenGL ES 3.2 ........................ no
-  Vulkan ................................. no
-  Session Management ..................... yes
-Features used by QPA backends:
-  evdev .................................. yes
-  libinput ............................... no
-  INTEGRITY HID .......................... no
-  mtdev .................................. no
-  tslib .................................. no
-  xkbcommon .............................. yes
-  X11 specific:
-    XLib ................................. yes
-    XCB Xlib ............................. yes
-    EGL on X11 ........................... yes
-    xkbcommon-x11 ........................ yes
-    xcb-sm ............................... no
-QPA backends:
-  DirectFB ............................... no
-  EGLFS .................................. yes
-  EGLFS details:
-    EGLFS OpenWFD ........................ no
-    EGLFS i.Mx6 .......................... no
-    EGLFS i.Mx6 Wayland .................. no
-    EGLFS RCAR ........................... no
-    eglfs_egldevice ...................... yes
-    eglfs_gbm ............................ yes
-    EGLFS VSP2 ........................... no
-    EGLFS Mali ........................... no
-    EGLFS Raspberry Pi ................... no
-    EGLFS X11 ............................ yes
-  LinuxFB ................................ yes
-  VNC .................................... yes
-  VK_KHR_display ......................... no
-  QNX:
-    lgmon ................................ no
-    IMF .................................. no
-  XCB:
-    Using system-provided xcb-xinput ..... yes
-    GL integrations:
-      GLX Plugin ......................... yes
-        XCB GLX .......................... yes
-      EGL-X11 Plugin ..................... yes
-  Windows:
-    Direct 2D ............................ no
-    Direct 2D 1.1 ........................ no
-    DirectWrite .......................... no
-    DirectWrite 3 ........................ no
-Qt Widgets:
-  GTK+ ................................... no
-  Styles ................................. Fusion Windows
-Qt Testlib:
-  Tester for item models ................. yes
-Qt PrintSupport:
-  CUPS ................................... yes
-Qt Sql Drivers:
-  DB2 (IBM) .............................. no
-  InterBase .............................. yes
-  MySql .................................. no
-  OCI (Oracle) ........................... no
-  ODBC ................................... no
-  PostgreSQL ............................. yes
-  SQLite ................................. yes
-    Using system provided SQLite ......... no
-Core tools:
-  qmake tool ............................. yes
-
-Qt is now configured for building. Just run 'cmake --build . --parallel'
-
-Once everything is built, you must run 'cmake --install .'
-Qt will be installed into '/home/quang/qt/qt6crosspi'
-
-To configure and build other Qt modules, you can use the following convenience script:
-        /home/quang/qt/qt6rpi/bin/qt-configure-module
-
-If reconfiguration fails for some reason, try to remove 'CMakeCache.txt' from the build directory 
-
--- Configuring done
--- Generating done
--- Build files have been written to: /home/quang/qt/qt-cross/qtbase-everywhere-src-6.3.0
+cd ~
+wget https://raw.githubusercontent.com/riscv/riscv-poky/master/scripts/sysroot-relativelinks.py
+chmod +x sysroot-relativelinks.py 
+python3 sysroot-relativelinks.py rpi-sysroot
 ```
-
-Lets start to build and install. Binaries will be in qt6rpi directory. 
-```bash
-cmake --build . --parallel 4
+Compile source code for rpi.
+```
+cd $HOME/qt6/pi-build
+cmake ../src/qtbase-everywhere-src-6.5.1/ -GNinja -DCMAKE_BUILD_TYPE=Release -DINPUT_opengl=es2 -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF -DQT_HOST_PATH=$HOME/qt6/host -DCMAKE_STAGING_PREFIX=$HOME/qt6/pi -DCMAKE_INSTALL_PREFIX=/usr/local/qt6 -DCMAKE_TOOLCHAIN_FILE=$HOME/qt6/toolchain.cmake -DQT_QMAKE_TARGET_MKSPEC=devices/linux-rasp-pi4-aarch64 -DQT_FEATURE_xcb=ON -DFEATURE_xcb_xlib=ON -DQT_FEATURE_xlib=ON
+cmake --build . --parallel 8
 cmake --install .
 ```
-
-Send binaries to raspberry pi.
-```bash
-rsync -avz --rsync-path="sudo rsync" /home/quang/qt/qt6rpi quang@192.168.30.44:/usr/local
+Send the binaries to rpi. **You should modify the following commands to your needs.**
 ```
-
-I reccommend you to do not move these directories. There are relative links that script files can work.
-When you compile the modules, helper scripts assume directory is in the same path.
-## Test compilation
-Lets create hello world application
-We need simple main.cpp and CMakeLists.txt, main.cpp is same with above.
-We need to add CMAKE_C_FLAGS and CMAKE_CXX_FLAGS to our cross compile cmake.
-```bash
-$ cd ..
-$ mkdir qtCrossExample
-$ cd !$
-
-$ cat<<EOF > main.cpp 
-#include <QCoreApplication>
-#include <QDebug>
-
-int main(int argc, char *argv[])
-{
-    QCoreApplication a(argc, argv);
-
-    qDebug()<<"Hello world";
-    return a.exec();
-}
-EOF
+rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/qt6
 ```
-Copy paste CMakeLists.txt:
-```bash
-cmake_minimum_required(VERSION 3.5)
+## With Qt Creator
+Set up **Compilers**.
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/e98645c4-cf99-45e3-a8b4-ecc0899d6fa0)
 
-project(HelloQt6 LANGUAGES CXX)
+Set up **Debuggers**.
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/f75adf17-b8eb-4149-a5fc-cf59978aa3d9)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+Set up **Devices**.
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/57609ea4-6901-41a8-8264-c6bb7aeac844)
 
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
+Click **Deploy Public Key...** to deploy the key. Create one if not existed.
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+Test the device.
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/9883e600-7963-48e3-98fc-dc3f2e651bff)
 
-find_package(Qt6Core)
+Set up **Qt Versions**.
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/6c43b6f0-a256-4d2d-86f6-80bb393602af)
 
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link, ${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
+Set up **Kits**.
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/93e04b07-7cbc-43d6-a17c-53fe6d272de9)
 
-add_executable(HelloQt6 main.cpp)
-
-target_link_libraries(HelloQt6 Qt6::Core)
+On **CMake Configuration** opton, click Change and add follow commands. **You should modify the following commands to your needs.**
 ```
-
-Compile the binary, we need qt-cmake file which is created after compilation of the Qt6.3.0 .
-It should be in the installation folder.
-qt-cmake file creates makefile.
-```bash
-$ /home/quang/qt/qt6rpi/bin/qt-cmake
-$ cmake --build .
-$ file HelloQt6
-HelloQt6: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 3.2.0, with debug_info, not stripped
+-DCMAKE_TOOLCHAIN_FILE:UNINITIALIZED=/home/quang/qt6/pi/lib/cmake/Qt6/qt.toolchain.cmake
 ```
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/d7c4600a-7058-4541-bdfd-ce184e7fd94c)
 
-then send the HelloQt6 binary to raspberry pi
-```bash
-quang@quang:~/qtCrossExample$ scp HelloQt6 quang@192.168.30.44:/home/quang/qt/
-quang@192.168.30.44's password: 
-HelloQt6                                      100%   12KB   3.2MB/s   00:00 
+## Test HelloWorld
+On **Help** option select **About Plugins**.Then uncheck **ClangCodeModel**(**No need for Qt Creator 10 or later**)..
+
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/efb1db08-c5cc-4210-adfe-85507e36d329)
+
+Append following piece of code to the end of CMakeLists.txt(**No need for Qt Creator 10 or later**).
 ```
-Go to raspberry pi or connect via ssh then run:
-(We need to export the path for libraries.
-When you check the dependecies with ldd, you should not see any non-found ones.) 
-```bash
-$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/qt6rpi/lib/
-$ cd $HOME
-quang@raspberrypi:~ $ ldd HelloQt6                                                       linux-vdso.so.1 (0xbeeea000)
-        /usr/lib/arm-linux-gnueabihf/libarmmem-${PLATFORM}.so => /usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so (0xb6f4b000)
-        libdl.so.2 => /lib/arm-linux-gnueabihf/libdl.so.2 (0xb6f1d000)
-        libQt6Core.so.6 => /usr/local/qt6rpi/lib/libQt6Core.so.6 (0xb6b0d000)
-        libstdc++.so.6 => /lib/arm-linux-gnueabihf/libstdc++.so.6 (0xb6985000)
-        libm.so.6 => /lib/arm-linux-gnueabihf/libm.so.6 (0xb6916000)
-        libgcc_s.so.1 => /lib/arm-linux-gnueabihf/libgcc_s.so.1 (0xb68e9000)
-        libpthread.so.0 => /lib/arm-linux-gnueabihf/libpthread.so.0 (0xb68bd000)
-        libc.so.6 => /lib/arm-linux-gnueabihf/libc.so.6 (0xb6769000)
-        /lib/ld-linux-armhf.so.3 (0xb6f60000)
-        libicui18n.so.67 => /lib/arm-linux-gnueabihf/libicui18n.so.67 (0xb64f1000)
-        libicuuc.so.67 => /lib/arm-linux-gnueabihf/libicuuc.so.67 (0xb6353000)
-        libicudata.so.67 => /lib/arm-linux-gnueabihf/libicudata.so.67 (0xb482d000)
-        libglib-2.0.so.0 => /lib/arm-linux-gnueabihf/libglib-2.0.so.0 (0xb470a000)
-        libz.so.1 => /lib/arm-linux-gnueabihf/libz.so.1 (0xb46e2000)
-        libpcre2-16.so.0 => /lib/arm-linux-gnueabihf/libpcre2-16.so.0 (0xb4656000)
-        libgthread-2.0.so.0 => /lib/arm-linux-gnueabihf/libgthread-2.0.so.0 (0xb4644000)
-        librt.so.1 => /lib/arm-linux-gnueabihf/librt.so.1 (0xb462c000)
-        libpcre.so.3 => /lib/arm-linux-gnueabihf/libpcre.so.3 (0xb45b5000)
-        
-quang@raspberrypi:~ $ ./HelloQt6
-Hello world
+install(TARGETS HelloWorld
+    RUNTIME DESTINATION ""
+    BUNDLE DESTINATION ""
+    LIBRARY DESTINATION ""
+)
 ```
+Goto **Projects**
+Under **Run** section, on **X11 Forwarding** check **Forward to local display** and input :0 to the text field. 
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/b396954b-fb04-48ae-a3c4-8ae67178513e)
 
-voila  !! You have cross compiled Qt6.3.0 for Raspberry pi !
+Under **Environment** section, click **Details** to expand the environment option. Click **Add**, then on **Variable** column type **LD_LIBRARY_PATH**. On the **Value** column, type **:/usr/local/qt6/lib/**.
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/059f275c-bfa4-4357-b4b6-82880b5c1054)
 
-We can play more with Qt Base. For instance there is a gui library inside base.
-Go to host ( ubuntu virtual machine )
-```bash
-$ cd $HOME
-$ mkdir qtCrossExampleGui
-$ cd !$
+Run.
 
-$ cat<<EOF > main.cpp 
-#include <QApplication>
-#include <QLabel>
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/ee26ad77-f370-433b-8734-89e70c21903c)
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-
-    QImage myImage;
-    myImage.load("/home/quang/qt/test.jpg");
-
-    QLabel myLabel;
-    myLabel.setPixmap(QPixmap::fromImage(myImage));
-
-    myLabel.show();
-
-    return a.exec();
-}
-EOF
+We have HelloWorld running on rpi now.
+## Add QML module
+Download source code.
 ```
-For CMakeLists.txt
-```bash
-$ cat<<EOF > CMakeLists.txt
-cmake_minimum_required(VERSION 3.5)
-
-project(qtGui LANGUAGES CXX)
-message("CMAKE_SYSROOT " ${CMAKE_SYSROOT})
-message("CMAKE_LIBRARY_ARCHITECTURE " ${CMAKE_LIBRARY_ARCHITECTURE})
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
-
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link, ${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-
-#include_directories(/home/quang/qt/qt6rpi/include/)
-
-add_executable(qtGui main.cpp)
-
-target_link_libraries(qtGui Qt6::Core Qt6::Gui Qt6::Widgets)
-EOF
+cd ~/qt6/src
+wget https://download.qt.io/official_releases/qt/6.5/6.5.1/submodules/qtshadertools-everywhere-src-6.5.1.tar.xz
+tar xf qtshadertools-everywhere-src-6.5.1.tar.xz
+wget https://download.qt.io/official_releases/qt/6.5/6.5.1/submodules/qtdeclarative-everywhere-src-6.5.1.tar.xz
+tar xf qtdeclarative-everywhere-src-6.5.1.tar.xz
 ```
+You can check dependencies at ~/qt6/src/qtdeclarative-everywhere-src-6.5.1/dependencies.yaml and ~/qt6/src/qtshadertools-everywhere-src-6.5.1/dependencies.yaml
+Make sure required modules should be built and installed first. 
 
-Update the path in the main.cpp (  "/home/quang/qt/test.jpg") according to target. You can use whichever image. (not all extension is supported but jpg and png are fine.)
-Send the binary like before example and run, then:
-
-![alt text](https://github.com/PhysicsX/QTonRaspberryPi/blob/main/voila.png?raw=true)
-
-## Build QML( qtdeclarative ) module
-[![Youtube video link](https://img.youtube.com/vi/GGhUtBKVy18/0.jpg)](//www.youtube.com/watch?v=GGhUtBKVy18?t=0s "quang dikme")
-
-Now it is time to build declarative module. You can build others using same idea. 
-But be careful. Modules can depend on each other. So when you try to configure it, check dependencies.yaml file in the related module directory. According to information in this directory you can choose the dependecies or needed modules.
-As I tested, declarative module depends on qtshadertools module for qt6.3.0
-
-```bash
-$ cd $HOME
-$ wget https://download.qt.io/archive/official_releases/qt/6.3/6.3.0/submodules/qtshadertools-everywhere-src-6.3.0.tar.xz
-wget https://download.qt.io/archive/qt/6.3/6.3.0/submodules/qtshadertools-everywhere-src-6.3.0.tar.xz
-$ wget https://download.qt.io/archive/qt/6.3/6.3.0/submodules/qtdeclarative-everywhere-src-6.3.0.tar.xz
+Build the modules for host
 ```
-first you need to build these for base before cross compilation. 
-```bash
-
-$ cd ../qt6HostBuild
-$ tar xf ../qtshadertools-everywhere-src-6.3.0.tar.xz
-$ tar xf ../qtdeclarative-everywhere-src-6.3.0.tar.xz
-
-$ cd qtshadertools-everywhere-src-6.3.0
-$ /home/quang/qt/qt6Host/bin/qt-configure-module .
-$ cmake --build . --parallel 4
-$ cmake --install .
-
-$ cd qtdeclarative-everywhere-src-6.3.0
-$ /home/quang/qt/qt6Host/bin/qt-configure-module .
-$ cmake --build . --parallel 4
-$ cmake --install .
-
+cd ~/qt6/host-build
+rm -rf *
+$HOME/qt6/host/bin/qt-configure-module ../src/qtshadertools-everywhere-src-6.5.1
+cmake --build . --parallel 8
+cmake --install .
+rm -rf *
+$HOME/qt6/host/bin/qt-configure-module ../src/qtdeclarative-everywhere-src-6.5.1
+cmake --build . --parallel 8
+cmake --install .
 ```
-Now we have qml binaries for host. If you want you can test it.
-Then we can make cross compilation for these modules for raspberry pi 4.
-```bash
-
-$ cd ../qt-cross
-$ tar xf ../qtshadertools-everywhere-src-6.3.0.tar.xz
-$ tar xf ../qtdeclarative-everywhere-src-6.3.0.tar.xz
-
-$ cd qtshadertools-everywhere-src-6.3.0
-$ /home/quang/qt/qt6rpi/bin/qt-configure-module .
-$ cmake --build . --parallel 4
-$ cmake --install .
-
-$ cd qtdeclarative-everywhere-src-6.3.0
-$ /home/quang/qt/qt6rpi/bin/qt-configure-module .
-$ cmake --build . --parallel 4
-$ cmake --install .
-
+Build the modules for rpi
 ```
-That is it! Lets send these to rasp, like we did before.
-```bash
-rsync -avz --rsync-path="sudo rsync" /home/quang/qt/qt6rpi quang@192.168.30.44:/usr/local
+cd ~/qt6/pi-build
+rm -rf *
+$HOME/qt6/pi/bin/qt-configure-module ../src/qtshadertools-everywhere-src-6.5.1
+cmake --build . --parallel 8
+cmake --install .
+rm -rf *
+$HOME/qt6/pi/bin/qt-configure-module ../src/qtdeclarative-everywhere-src-6.5.1
+cmake --build . --parallel 8
+cmake --install .
 ```
-## Test QML( qtdeclarative ) module
-```bash
-$ cd $HOME
-$ mkdir qtCrossExampleQml
-$ cd !$
+Send the binaries to rpi. **You should modify the following commands to your needs.**
 ```
-Copy paste following files (All in the qtCrossExampleQml directory):
-for CMakeLists.txt
-```bash
-cmake_minimum_required(VERSION 3.5)
-
-project(HelloQt6Qml LANGUAGES CXX)
-message("CMAKE_SYSROOT " ${CMAKE_SYSROOT})
-message("CMAKE_LIBRARY_ARCHITECTURE " ${CMAKE_LIBRARY_ARCHITECTURE})
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(Qt6 COMPONENTS Core Quick REQUIRED)
-
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link, ${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
-
-add_executable(HelloQt6Qml main.cpp)
-
-target_link_libraries(HelloQt6Qml -lm -ldl Qt6::Core Qt6::Quick)
+rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/qt6
 ```
-For main.cpp ( becareful for the path link in the main function. Update it accordingly for your raspberry pi user name)
-```bash
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-
-int main(int argc, char *argv[])
-{
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-    QGuiApplication app(argc, argv);
-
-    QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("/home/quang/qt/main.qml"));
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
-
-    return app.exec();
-}
-```
-For main.qml
-```bash
-import QtQuick 2.12
-import QtQuick.Window 2.12
-
-Window {
-    visible: true
-    width: 640
-    height: 480
-    title: qsTr("CROSS COMPILED QT6")
+## Test HelloWorldQml
+![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/f67fd349-3537-42f0-8e15-244f138a09d4)
 
 
-	Rectangle {
-	    width: parent.width
-	    height: parent.height
-
-	    Rectangle {
-		id: button
-
-		width: 100
-		height: 30
-		color: "blue"
-		anchors.centerIn: parent
-
-		Text {
-		    id: buttonText
-		    text: qsTr("Button")
-		    color: "white"
-		    anchors.centerIn: parent
-		}
-
-		MouseArea {
-		    anchors.fill: parent
-		    onClicked: {
-		        buttonText.text = qsTr("Clicked");
-		        buttonText.color = "black";
-		    }
-		}
-	    }
-	}
-}
-```
-
-Compile the example and send the binary and qml file to rasp. ( we did not embed the qml to binary for this example )
-```bash
-$ /home/quang/qt/qt6rpi/bin/qt-cmake
-$ cmake --build .
-$ scp HelloQt6Qml main.qml quang@192.168.30.44:/home/quang/qt/
-```

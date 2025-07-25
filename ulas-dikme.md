@@ -19,7 +19,7 @@ But it is up to you.
 
 Update raspberry pi
 ```bash
-$ sudo apt update
+ sudo apt update
 $ sudo apt full-upgrade
 $ sudo reboot
 $ sudo rpi-update 6db8c1cdd3da2f070866d2149c956ce86a4ccdd5
@@ -52,8 +52,8 @@ sudo apt remove libzstd-dev libharfbuzz-bin libharfbuzz-dev
 Create a directory for binaries.Give enough permission for your user.
 
 ```bash
-$ sudo mkdir /usr/local/qt6pi
-$ sudo chown quang:quang /usr/local/qt6pi
+$ sudo mkdir /usr/local/qt6rpi
+$ sudo chown quang:quang /usr/local/qt6rpi
 ```
 
 # Prepare Ubuntu
@@ -109,12 +109,14 @@ As I see host version should be same with the cross one.
 All the directories are in the home directory except toolchain. ( so check paths about it. )
 ```bash
 $ cd ~
+$ mkdir qt
+$ cd ~/qt
 $ wget https://download.qt.io/archive/qt/6.3/6.3.0/submodules/qtbase-everywhere-src-6.3.0.tar.xz
 $ mkdir qt6HostBuild
 $ cd !$
 $ tar xf ../qtbase-everywhere-src-6.3.0.tar.xz
 $ cd qtbase-everywhere-src-6.3.0
-$ cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DINPUT_opengl=es2 -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/home/quang/qt6Host
+$ cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DINPUT_opengl=es2 -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/home/quang/qt/qt6Host
 $ cmake --build . --parallel 4
 $ cmake --install .
 ```
@@ -159,7 +161,7 @@ add_executable(HelloQt6 main.cpp)
 target_link_libraries(HelloQt6 Qt6::Core)
 EOF
 
-/home/quang/qt6Host/bin/qt-cmake
+/home/quang/qt/qt6Host/bin/qt-cmake
 cmake --build .
 ./HelloQt6
 ```
@@ -184,7 +186,7 @@ drwxr-xr-x 8 quang quang      4096 sep  4  2019 rpi-gcc-8.3.0
 Install sysroot from raspberry pi target device. ( be sure it is in the same network. Just ping )
 Update the user name and the ip adress of yours.
 ```bash
-$ cd $HOME
+$ cd $HOME/qt
 $ mkdir rpi-sdk 
 $ cd !$
 
@@ -217,7 +219,7 @@ include_guard(GLOBAL)
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
-set(TARGET_SYSROOT /home/quang/rpi-sdk/sysroot)
+set(TARGET_SYSROOT /home/quang/qt/rpi-sdk/sysroot)
 
 set(CROSS_COMPILER /opt/rpi/rpi-gcc-8.3.0/bin/arm-linux-gnueabihf)
 
@@ -256,9 +258,9 @@ $ tar xf ../qtbase-everywhere-src-6.3.0.tar.xz
 
 $cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DQT_FEATURE_eglfs_egldevice=ON -DQT_FEATURE_eglfs_gbm=ON \
 -DQT_BUILD_TOOLS_WHEN_CROSSCOMPILING=ON  -DQT_BUILD_EXAMPLES=OFF -DQT_BUILD_TESTS=OFF \
--DQT_HOST_PATH=/home/quang/qt6Host -DCMAKE_STAGING_PREFIX=/home/quang/qt6rpi \
--DCMAKE_INSTALL_PREFIX=/home/quang/qt6crosspi -DCMAKE_PREFIX_PATH=/home/quang/rpi-sdk/sysroot/usr/lib/ \
--DCMAKE_TOOLCHAIN_FILE=/home/quang/qt-cross/toolchain.cmake /home/quang/qt-cross/qtbase-everywhere-src-6.3.0/
+-DQT_HOST_PATH=/home/quang/qt/qt6Host -DCMAKE_STAGING_PREFIX=/home/quang/qt/qt6rpi \
+-DCMAKE_INSTALL_PREFIX=/home/quang/qt/qt6crosspi -DCMAKE_PREFIX_PATH=/home/quang/qt/rpi-sdk/sysroot/usr/lib/ \
+-DCMAKE_TOOLCHAIN_FILE=/home/quang/qt/qt-cross/toolchain.cmake /home/quang/qt/qt-cross/qtbase-everywhere-src-6.3.0/
 ```
 After this you should see like this (If it is configured successfully):
 (If the configuration result is not in the output check the config.summary file in the same directory. It should be exist after configuration. It is explained in the video.)
@@ -440,16 +442,16 @@ Core tools:
 Qt is now configured for building. Just run 'cmake --build . --parallel'
 
 Once everything is built, you must run 'cmake --install .'
-Qt will be installed into '/home/quang/qt6crosspi'
+Qt will be installed into '/home/quang/qt/qt6crosspi'
 
 To configure and build other Qt modules, you can use the following convenience script:
-        /home/quang/qt6rpi/bin/qt-configure-module
+        /home/quang/qt/qt6rpi/bin/qt-configure-module
 
 If reconfiguration fails for some reason, try to remove 'CMakeCache.txt' from the build directory 
 
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/quang/qt-cross/qtbase-everywhere-src-6.3.0
+-- Build files have been written to: /home/quang/qt/qt-cross/qtbase-everywhere-src-6.3.0
 ```
 
 Lets start to build and install. Binaries will be in qt6rpi directory. 
@@ -460,7 +462,7 @@ cmake --install .
 
 Send binaries to raspberry pi.
 ```bash
-rsync -avz --rsync-path="sudo rsync" /home/quang/qt6rpi quang@192.168.30.44:/usr/local
+rsync -avz --rsync-path="sudo rsync" /home/quang/qt/qt6rpi quang@192.168.30.44:/usr/local
 ```
 
 I reccommend you to do not move these directories. There are relative links that script files can work.
@@ -516,7 +518,7 @@ Compile the binary, we need qt-cmake file which is created after compilation of 
 It should be in the installation folder.
 qt-cmake file creates makefile.
 ```bash
-$ /home/quang/qt6rpi/bin/qt-cmake
+$ /home/quang/qt/qt6rpi/bin/qt-cmake
 $ cmake --build .
 $ file HelloQt6
 HelloQt6: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 3.2.0, with debug_info, not stripped
@@ -524,7 +526,7 @@ HelloQt6: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically li
 
 then send the HelloQt6 binary to raspberry pi
 ```bash
-quang@quang:~/qtCrossExample$ scp HelloQt6 quang@192.168.30.44:/home/quang/
+quang@quang:~/qtCrossExample$ scp HelloQt6 quang@192.168.30.44:/home/quang/qt/
 quang@192.168.30.44's password: 
 HelloQt6                                      100%   12KB   3.2MB/s   00:00 
 ```
@@ -576,7 +578,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QImage myImage;
-    myImage.load("/home/quang/test.jpg");
+    myImage.load("/home/quang/qt/test.jpg");
 
     QLabel myLabel;
     myLabel.setPixmap(QPixmap::fromImage(myImage));
@@ -603,7 +605,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link, ${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wl,-rpath-link,${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
 
-#include_directories(/home/quang/qt6rpi/include/)
+#include_directories(/home/quang/qt/qt6rpi/include/)
 
 add_executable(qtGui main.cpp)
 
@@ -611,7 +613,7 @@ target_link_libraries(qtGui Qt6::Core Qt6::Gui Qt6::Widgets)
 EOF
 ```
 
-Update the path in the main.cpp (  "/home/quang/test.jpg") according to target. You can use whichever image. (not all extension is supported but jpg and png are fine.)
+Update the path in the main.cpp (  "/home/quang/qt/test.jpg") according to target. You can use whichever image. (not all extension is supported but jpg and png are fine.)
 Send the binary like before example and run, then:
 
 ![alt text](https://github.com/PhysicsX/QTonRaspberryPi/blob/main/voila.png?raw=true)
@@ -637,12 +639,12 @@ $ tar xf ../qtshadertools-everywhere-src-6.3.0.tar.xz
 $ tar xf ../qtdeclarative-everywhere-src-6.3.0.tar.xz
 
 $ cd qtshadertools-everywhere-src-6.3.0
-$ /home/quang/qt6Host/bin/qt-configure-module .
+$ /home/quang/qt/qt6Host/bin/qt-configure-module .
 $ cmake --build . --parallel 4
 $ cmake --install .
 
 $ cd qtdeclarative-everywhere-src-6.3.0
-$ /home/quang/qt6Host/bin/qt-configure-module .
+$ /home/quang/qt/qt6Host/bin/qt-configure-module .
 $ cmake --build . --parallel 4
 $ cmake --install .
 
@@ -656,19 +658,19 @@ $ tar xf ../qtshadertools-everywhere-src-6.3.0.tar.xz
 $ tar xf ../qtdeclarative-everywhere-src-6.3.0.tar.xz
 
 $ cd qtshadertools-everywhere-src-6.3.0
-$ /home/quang/qt6rpi/bin/qt-configure-module .
+$ /home/quang/qt/qt6rpi/bin/qt-configure-module .
 $ cmake --build . --parallel 4
 $ cmake --install .
 
 $ cd qtdeclarative-everywhere-src-6.3.0
-$ /home/quang/qt6rpi/bin/qt-configure-module .
+$ /home/quang/qt/qt6rpi/bin/qt-configure-module .
 $ cmake --build . --parallel 4
 $ cmake --install .
 
 ```
 That is it! Lets send these to rasp, like we did before.
 ```bash
-rsync -avz --rsync-path="sudo rsync" /home/quang/qt6rpi quang@192.168.30.44:/usr/local
+rsync -avz --rsync-path="sudo rsync" /home/quang/qt/qt6rpi quang@192.168.30.44:/usr/local
 ```
 ## Test QML( qtdeclarative ) module
 ```bash
@@ -708,7 +710,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("/home/quang/main.qml"));
+    const QUrl url(QStringLiteral("/home/quang/qt/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
@@ -764,7 +766,7 @@ Window {
 
 Compile the example and send the binary and qml file to rasp. ( we did not embed the qml to binary for this example )
 ```bash
-$ /home/quang/qt6rpi/bin/qt-cmake
+$ /home/quang/qt/qt6rpi/bin/qt-cmake
 $ cmake --build .
-$ scp HelloQt6Qml main.qml quang@192.168.30.44:/home/quang/
+$ scp HelloQt6Qml main.qml quang@192.168.30.44:/home/quang/qt/
 ```
