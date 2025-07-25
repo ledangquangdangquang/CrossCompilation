@@ -407,7 +407,7 @@ rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/
 >LD_LIBRARY_PATH
 >```
 >```
->/usr/local/qt6/lib
+>:/usr/local/qt6/lib
 >```
 
 ---
