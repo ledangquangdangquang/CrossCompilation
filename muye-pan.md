@@ -1,4 +1,10 @@
 # Cross compilation of Qt6.5.1 for RPI
+This page shows steps to compile Qt6.5.1 for RPI. Hope this page will help those stuck at following official tutorial. Before start, it is highly recommended that you use the same **Ubuntu 22.04**. At least not the older one. 
+
+Click the follow image to view this tutorial on Youtube.
+
+[![Youtube video link](https://i.ytimg.com/vi/8kpHgNKPooc/hqdefault.jpg)](//youtu.be/8kpHgNKPooc "Youtube Video")
+
 - Cross Compilation https://youtu.be/8kpHgNKPooc
 - Remote Debugging https://youtu.be/QWz-4R4kMIo
 - Localization https://youtu.be/JtTtzYZ_Nk0
@@ -7,17 +13,6 @@
 > * ***Only one line to copy for each step.***
 > * ***One terminal on the host to set up.***
 > * ***Plz be patient and calm.***
-
-# System Requirements
-* Ubuntu 
-```
-Distributor ID:	Ubuntu
-Description:	Ubuntu 22.04.5 LTS
-Release:	22.04
-Codename:	jammy
-```
-* Raspberry Pi Os 
-
 # Prepare RPI
 Install the lastest 64bit Raspberry Pi OS with desktop and update the system.
 Check firmware:
@@ -354,10 +349,6 @@ Run.
 
 We have HelloWorld running on rpi now.
 ## Add QML module
-> [!TIP]
-> - ***Create a copy of the host-build and pi-build folders.***
-> - ***It is recommended to start copying from the block below.***
-
 Download source code.
 ```
 cd ~/qt6/src
