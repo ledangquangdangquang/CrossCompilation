@@ -1,4 +1,4 @@
-# Cross compilation of Qt6.5.1 for RPI
+ Cross compilation of Qt6.5.1 for RPI
 - Cross Compilation https://youtu.be/8kpHgNKPooc
 - Remote Debugging https://youtu.be/QWz-4R4kMIo
 - Localization https://youtu.be/JtTtzYZ_Nk0
