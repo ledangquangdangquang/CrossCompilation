@@ -10,9 +10,9 @@ Click the follow image to view this tutorial on Youtube.
 - Localization https://youtu.be/JtTtzYZ_Nk0
 - Reference: https://youtube.com/playlist?list=PLw1hBEGKfRbmvt57e-JriZclgbSSHYzwH&feature=shared 
 > [!NOTE]
-> Only one line to copy for each step.
-> One terminal on the host to set up.
-> Plz be patient and calm.
+> * ***Only one line to copy for each step.***
+> * ***One terminal on the host to set up.***
+> * ***Plz be patient and calm.***
 # Prepare RPI
 Install the lastest 64bit Raspberry Pi OS with desktop and update the system.
 Check firmware:
