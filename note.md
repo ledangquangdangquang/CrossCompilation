@@ -33,7 +33,12 @@ arch64-linux-gnu-gcc hello.c -o hello_rpi
 ```
 
 --- 
-## See a path `$PATH` 
+# See a path `$PATH` 
 ```
 echo "$PATH" | tr ':' '\n' 
+```
+
+# Alias
+```
+git config --global alias.acp '!f() { git add . && git commit -m "$1" && git push origin main; }; f'
 ```
