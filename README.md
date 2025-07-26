@@ -2,7 +2,9 @@
 - Cross Compilation https://youtu.be/8kpHgNKPooc
 - Remote Debugging https://youtu.be/QWz-4R4kMIo
 - Localization https://youtu.be/JtTtzYZ_Nk0
-- Reference: https://youtube.com/playlist?list=PLw1hBEGKfRbmvt57e-JriZclgbSSHYzwH&feature=shared 
+- Reference (LearnQT): https://youtube.com/playlist?list=PLw1hBEGKfRbmvt57e-JriZclgbSSHYzwH&feature=shared 
+- Reference (MuyePan): https://www.youtube.com/watch?v=8kpHgNKPooc
+> [!IMPORTANT]
 > [!IMPORTANT]
 > * ***Only one line to copy for each step.***
 > * ***One terminal on the host to set up.***
@@ -398,6 +400,7 @@ Send the binaries to rpi. **You should modify the following commands to your nee
 rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/qt6
 ```
 ## Test HelloWorldQml
+> Create Project -> Select Qt Quick Application to enable QML project
 ![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/f67fd349-3537-42f0-8e15-244f138a09d4)
 > [!IMPORTANT]
 > * Each new project
