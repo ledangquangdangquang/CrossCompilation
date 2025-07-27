@@ -1,5 +1,11 @@
 <h1 align="center">General-Purpose Input/Output Setup for Qt 6 Cross-Compilation</h1>
 
+> [!IMPORTANT]
+> * ***Change the hostname and username of Raspberry Pi OS (`pi@192.168.30.77`)***
+> * ***Change the username of Ubuntu (`quang`)***
+> * ***Only one line to copy for each step.***
+> * ***One terminal on the host to set up.***
+> * ***Plz be patient and calm.***
 ## On Raspberry Pi
 ***1. Download wiringPi***
 ```
@@ -38,6 +44,16 @@ rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/lib rpi-sysroot/usr
 ```
 ***2. Edit `CMakeLists.txt`*** 
 Create new wiget project in **Qt creator** then append this text in file **CMakeLists.txt** 
+> [!IMPORTANT]
+> * Each new project
+>     * Under **Run** section, on **X11 Forwarding** check **Forward to local display** and input :0 to the text field. 
+>     * Under **Environment** section, click **Details** to expand the environment option. Click **Add**, then on **Variable** column type **LD_LIBRARY_PATH**. On the **Value** column, type **:/usr/local/qt6/lib/**.
+>       ```
+>       LD_LIBRARY_PATH
+>       ```
+>       ```
+>       :/usr/local/qt6/lib
+>        ```
 ```
 # --------------------------------------------------------------------------------
 #              			 --- Wiring Pi library set up ---
@@ -46,9 +62,13 @@ find_library(WIRINGPI_LIB wiringPi PATHS /usr/lib)
 if(WIRINGPI_LIB)
     target_link_libraries(gpioTest PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${WIRINGPI_LIB})
 else()
-    message(FATAL_ERROR "Khong tim thay thu vien wiring Pi")
+    message(FATAL_ERROR "Không tìm thấy thư viện wiringPi")
 endif()
 # --------------------------------------------------------------------------------
 ```
 ***3. ERORR: Could not find the WiringPi library*** 
-
+```
+rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/lib rpi-sysroot/usr/local 
+ln -sf ~/rpi-sysroot/usr/local/lib/libwiringPi.so.* libwiringPi.so
+ln -sf ~/rpi-sysroot/usr/local/lib/libwiringPiDev.so.* libwiringPiDev.so
+```
