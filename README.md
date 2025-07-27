@@ -314,7 +314,7 @@ rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/
 Download Qt Creator
 ```
 cd ~ 
-wget https://github.com/qt-creator/qt-creator/releases/tag/v10.0.0 
+wget https://github.com/qt-creator/qt-creator/releases/download/v10.0.0/qtcreator-linux-x64-10.0.0.deb
 sudo dpkg -i qtcreator-linux-x64-10.0.0.deb 
 rm qtcreator-linux-x64-10.0.0.deb 
 ```
