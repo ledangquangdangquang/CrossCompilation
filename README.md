@@ -19,7 +19,12 @@ Release:	22.04
 Codename:	jammy
 ```
 * Raspberry Pi Os 
-
+```
+Distributor ID:	Debian
+Description:	Debian GNU/Linux 11 (bullseye)
+Release:	11
+Codename:	bullseye
+```
 # Prepare RPI
 Install the lastest 64bit Raspberry Pi OS with desktop and update the system.
 Check firmware:
