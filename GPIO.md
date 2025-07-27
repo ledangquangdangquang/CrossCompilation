@@ -45,7 +45,7 @@ rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/lib rpi-sysroot/usr
 ```
 ***2. Edit `CMakeLists.txt`*** 
 
-Create new wiget project in **Qt creator** then append this text in file **CMakeLists.txt** 
+Create new **Qt Widgets Application** project in **Qt creator** then edit file **CMakeLists.txt** 
 > [!IMPORTANT]
 > * Each new project
 >     * Under **Run** section, on **X11 Forwarding** check **Forward to local display** and input :0 to the text field. 
@@ -56,18 +56,22 @@ Create new wiget project in **Qt creator** then append this text in file **CMake
 >       ```
 >       :/usr/local/qt6/lib
 >        ```
-```
+
+
+* Delete line: `target_link_libraries(showImg PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)` 
+* Append this code:
+    ```
 # --------------------------------------------------------------------------------
 #              			 --- Wiring Pi library set up ---
-find_library(WIRINGPI_LIB wiringPi PATHS /usr/lib)
+    find_library(WIRINGPI_LIB wiringPi PATHS /usr/lib)
 
-if(WIRINGPI_LIB)
-    target_link_libraries(gpioTest PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${WIRINGPI_LIB})
-else()
-    message(FATAL_ERROR "Không tìm thấy thư viện wiringPi")
-endif()
+    if(WIRINGPI_LIB)
+        target_link_libraries(gpioTest PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${WIRINGPI_LIB})
+    else()
+        message(FATAL_ERROR "Không tìm thấy thư viện wiringPi")
+    endif()
 # --------------------------------------------------------------------------------
-```
+    ```
 ***3. ERORR: Could not find the WiringPi library*** 
 ```
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/lib rpi-sysroot/usr/local 
