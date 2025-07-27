@@ -316,6 +316,7 @@ Download Qt Creator
 cd ~ 
 wget https://github.com/qt-creator/qt-creator/releases/tag/v10.0.0 
 sudo dpkg -i qtcreator-linux-x64-10.0.0.deb 
+rm qtcreator-linux-x64-10.0.0.deb 
 ```
 Then open **Qt Creator** in `/opt/qt-creator/bin`
 
