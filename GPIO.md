@@ -24,5 +24,8 @@ sudo apt install ./wiringpi-3.x.deb
 * Check in `/usr/include`
 ## On host (Ubuntu)
 ***1. rsync***
+
 ***2. Edit `CMakeLists.txt`*** 
+
 ***3. ERORR: Could not find the WiringPi library*** 
+
