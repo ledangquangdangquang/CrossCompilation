@@ -44,6 +44,7 @@ rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/include rpi-sysroot/u
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/lib rpi-sysroot/usr 
 ```
 ***2. Edit `CMakeLists.txt`*** 
+
 Create new wiget project in **Qt creator** then append this text in file **CMakeLists.txt** 
 > [!IMPORTANT]
 > * Each new project
