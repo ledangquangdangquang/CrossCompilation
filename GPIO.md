@@ -74,6 +74,7 @@ Create new **Qt Widgets Application** project in **Qt creator** then edit file *
     ```
 > [!NOTE]
 > `gpioTest` is the name of the project. If you have a different name, you should edit it accordingly.
+
 ***3. ERORR: Could not find the WiringPi library*** 
 ```
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/lib rpi-sysroot/usr/local 
