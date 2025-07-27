@@ -21,7 +21,15 @@ sudo apt install ./wiringpi-3.x.deb
     ```
 
 * Check in `/usr/lib`
+    ```
+    ls -l /usr/lib
+    ```
+    Check available file `libwiringPiDev.so` and `libwiringPi.so`
 * Check in `/usr/include`
+    ```
+    ls -l /usr/include
+    ```
+    Check available file `wiringPi.h`
 ## On host (Ubuntu)
 ***1. rsync***
 
