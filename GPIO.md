@@ -61,8 +61,8 @@ Create new **Qt Widgets Application** project in **Qt creator** then edit file *
 * Delete line: `target_link_libraries(showImg PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)` 
 * Append this code:
     ```
-# --------------------------------------------------------------------------------
-#              			 --- Wiring Pi library set up ---
+    # --------------------------------------------------------------------------------
+    #              			 --- Wiring Pi library set up ---
     find_library(WIRINGPI_LIB wiringPi PATHS /usr/lib)
 
     if(WIRINGPI_LIB)
@@ -70,7 +70,7 @@ Create new **Qt Widgets Application** project in **Qt creator** then edit file *
     else()
         message(FATAL_ERROR "Không tìm thấy thư viện wiringPi")
     endif()
-# --------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
     ```
 ***3. ERORR: Could not find the WiringPi library*** 
 ```
