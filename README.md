@@ -311,6 +311,14 @@ Send the binaries to rpi. **You should modify the following commands to your nee
 rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/qt6
 ```
 ## With Qt Creator
+Download Qt Creator
+```
+cd ~ 
+wget https://github.com/qt-creator/qt-creator/releases/tag/v10.0.0 
+sudo dpkg -i qtcreator-linux-x64-10.0.0.deb 
+```
+Then open **Qt Creator** in `/opt/qt-creator/bin`
+
 Set up **Compilers**.
 ![image](https://github.com/MuyePan/CrossCompileQtForRpi/assets/136073506/e98645c4-cf99-45e3-a8b4-ecc0899d6fa0)
 
