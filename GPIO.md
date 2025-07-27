@@ -1,5 +1,6 @@
 <h1 align="center">General-Purpose Input/Output Setup for Qt 6 Cross-Compilation</h1>
 
+- Reference (LearnQT): https://www.youtube.com/watch?v=w31cLOh3wiE
 > [!IMPORTANT]
 > * ***Change the hostname and username of Raspberry Pi OS (`pi@192.168.30.77`)***
 > * ***Change the username of Ubuntu (`quang`)***
