@@ -1,5 +1,5 @@
 # Installation
-
+# For Host (x86_64)
 ## 0. Important
 ```
 sudo apt install gstreamer1.0-plugins-base \\
@@ -53,4 +53,12 @@ target_link_libraries(camtest2
 install(TARGETS camtest2
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 ```
-
+# For RPI (ARM64)
+## 0.
+## 1.
+## 2. 
+## 3. 
+```
+rsync -avz --rsync-path="sudo rsync" $HOME/qt6/pi/* pi@192.168.30.77:/usr/local/qt6
+```
+## 4.
