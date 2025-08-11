@@ -14,7 +14,11 @@ scp hello quang@192.168.30.44:/home/quang/hello
 ```
 scp -r /path/to/local/hello username@raspberrypi_ip:/path/to/remote/destination
 ```
-
+# SSH see file 
+See syslog file in raspberrypi:
+```
+ssh pi@192.168.30.43 tail -f /var/log/syslog
+```
 # SSH control 
 -   Ubutu user control raspberry pi os:
 ```
@@ -87,14 +91,3 @@ sudo parted -l
 Bao gồm 2 loại 
 1. UEFI (unified extensible firmware interface)
 2. Legacy icons
-| Đặc điểm               | **UEFI**                            | **BIOS (Legacy)**                             |
-| ---------------------- | ----------------------------------- | --------------------------------------------- |
-| Giao diện              | Giao diện đồ họa, dùng chuột        | Chỉ hỗ trợ bàn phím, giao diện văn bản        |
-| Kiểu phân vùng         | GPT (GUID Partition Table)          | MBR (Master Boot Record)                      |
-| Hỗ trợ ổ cứng          | >2 TB (qua GPT)                     | Tối đa 2 TB                                   |
-| Phân vùng khởi động    | **/boot/efi** (định dạng FAT32)     | Không có hoặc dùng phân vùng `/boot` đơn giản |
-| Tốc độ khởi động       | Nhanh hơn                           | Chậm hơn                                      |
-| Hệ điều hành hỗ trợ    | Linux, Windows 8 trở lên, macOS mới | Cũ hơn, Windows 7 trở về trước                |
-| Tên gọi trong firmware | "UEFI"                              | "Legacy Boot" hoặc "CSM"                      |
-| Vị trí lưu bootloader  | Trong EFI System Partition (ESP)    | Trong MBR (sector đầu tiên của ổ đĩa)         |
-
