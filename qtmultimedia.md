@@ -1,4 +1,19 @@
 # Installation
+# Dependencies
+```
+  ../qtbase:
+    ref: 55aee8697512af105dfefabc1e2ec41d4df1e45e
+    required: true
+  ../qtdeclarative:
+    ref: 65651dc1d333e2aded18b0d6f0b71c35e5b40c1c
+    required: false
+  ../qtquick3d:
+    ref: c3fcfc65a3ea38013081eb93ff351609f368dfaf
+    required: false
+  ../qtshadertools:
+    ref: 46e8aadf1c6e19b5c177dfb2c1111e245ef37917
+    required: true
+```
 # For Host (x86_64)
 ## 0. Important
 ```
