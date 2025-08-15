@@ -37,7 +37,55 @@ sudo make install
 ```bash
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/lib rpi-sysroot/usr/local 
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/include rpi-sysroot/usr/local
+```
+## CmakeLists.txt
+```
+cmake_minimum_required(VERSION 3.18)
+project(testOpenPi LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# --- Qt6 Widgets ---------------
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core)
+# -------------------------------
+
+# --- OpenCV --------------------
+# Trỏ tới sysroot đã rsync header + CMake config
+set(OpenCV_DIR /home/quang/rpi-sysroot/usr/local/lib/aarch64-linux-gnu/cmake/opencv4)
+find_package(OpenCV REQUIRED)
+
+if(NOT OpenCV_FOUND)
+    message(FATAL_ERROR "Không tìm thấy OpenCV")
+endif()
+message(STATUS "Found OpenCV version: ${OpenCV_VERSION}")
+include_directories(${OpenCV_INCLUDE_DIRS})
+# -------------------------------
+
+# --- Build executable ----------
+add_executable(testOpenPi main.cpp)
+
+target_link_libraries(testOpenPi
+    Qt6::Core
+    Qt6::Widgets
+    ${WIRINGPI_LIB}
+    ${OpenCV_LIBS}
+    pthread
+    dl
+    m
+    rt
+)
+# -------------------------------
+
+# --- Install -------------------
+install(TARGETS testOpenPi
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+# -------------------------------
 ```
 # For Host (Optional)
 
