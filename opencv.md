@@ -1,6 +1,7 @@
 <h1 align = "center">OpenCV </h1>
 
 # For Pi
+## 1. On Pi
 ```bash
 cd ~
 git clone https://github.com/opencv/opencv.git
@@ -30,15 +31,17 @@ cmake -D CMAKE_BUILD_TYPE=Release \
       -DWITH_OPENCL=OFF \
       -DWITH_OPENGL=OFF ..
 ```
+## 2. On Pi
 ```bash
 make -j4
 sudo make install
 ```
+## 3. On host
 ```bash
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/lib rpi-sysroot/usr/local 
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/include rpi-sysroot/usr/local
 ```
-## CmakeLists.txt
+## 4. CmakeLists.txt (on host)
 ```c
 cmake_minimum_required(VERSION 3.18)
 project(testOpenPi LANGUAGES CXX)
