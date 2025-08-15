@@ -2,6 +2,17 @@
 
 # For Pi
 ```bash
+cd ~
+git clone https://github.com/opencv/opencv.git
+cd opencv
+git checkout 4.5.5
+cd ~
+git clone https://github.com/opencv/opencv_contrib.git
+cd opencv_contrib
+git checkout 4.5.5
+cd ~/opencv
+
+mkdir build && cd build
 rm -rf ~/opencv/build
 mkdir ~/opencv/build
 cd ~/opencv/build
