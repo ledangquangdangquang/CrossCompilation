@@ -116,7 +116,7 @@ install(TARGETS testOpenPi
 
 ```
 ## main.cpp
-```
+```c
 #include <QApplication>
 #include <QLabel>
 #include <QTimer>
