@@ -39,7 +39,7 @@ rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/lib rpi-sysroot
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/include rpi-sysroot/usr/local
 ```
 ## CmakeLists.txt
-```
+```c
 cmake_minimum_required(VERSION 3.18)
 project(testOpenPi LANGUAGES CXX)
 
@@ -89,7 +89,7 @@ install(TARGETS testOpenPi
 ```
 # For Host (Optional)
 
-```
+```bash
 cd $HOME
 git clone https://github.com/opencv/opencv.git
 git clone https://github.com/opencv/opencv_contrib.git
