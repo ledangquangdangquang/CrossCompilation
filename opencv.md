@@ -1,3 +1,34 @@
+<h1 align = "center">OpenCV </h1>
+# For Pi
+```bash
+rm -rf ~/opencv/build
+mkdir ~/opencv/build
+cd ~/opencv/build
+
+cmake -D CMAKE_BUILD_TYPE=Release \
+      -D CMAKE_INSTALL_PREFIX=/usr/local \
+      -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
+      -DBUILD_opencv_python3=OFF \
+      -DBUILD_opencv_python2=OFF \
+      -DWITH_JAVA=OFF \
+      -DBUILD_TESTS=OFF \
+      -DBUILD_EXAMPLES=OFF \
+      -DWITH_IPP=OFF \
+      -DWITH_TBB=OFF \
+      -DWITH_OPENCL=OFF \
+      -DWITH_OPENGL=OFF ..
+```
+```bash
+make -j4
+sudo make install
+```
+```bash
+rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/lib rpi-sysroot/usr/local 
+rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/include rpi-sysroot/usr/local
+
+```
+# For Host (Optional)
+
 ```
 cd $HOME
 git clone https://github.com/opencv/opencv.git
