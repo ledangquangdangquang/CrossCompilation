@@ -223,3 +223,46 @@ ninja -j8
 ninja install
 
 ```
+## CmakeLists
+```c
+cmake_minimum_required(VERSION 3.14)
+
+project(testOpenHost LANGUAGES CXX)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Qt
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+
+# OpenCV (chỉ đường dẫn tới bản bạn build)
+set(OpenCV_DIR "$ENV{HOME}/opencv-install/lib/cmake/opencv4")
+find_package(OpenCV REQUIRED)
+
+add_executable(testOpenHost
+  main.cpp
+)
+
+target_link_libraries(testOpenHost
+    Qt${QT_VERSION_MAJOR}::Core
+    ${OpenCV_LIBS}
+)
+
+target_include_directories(testOpenHost PRIVATE
+    ${OpenCV_INCLUDE_DIRS}
+)
+
+# In ra version OpenCV khi cmake chạy
+message(STATUS "OpenCV version: ${OpenCV_VERSION}")
+message(STATUS "OpenCV include: ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "OpenCV libs: ${OpenCV_LIBS}")
+
+install(TARGETS testOpenHost
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+```
