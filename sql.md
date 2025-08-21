@@ -55,13 +55,13 @@ sudo apt install postgresql postgresql-contrib
 
 ### Login 
 - Switch user
-```bash
-sudo -i -u postgres
-```
+  ```bash
+  sudo -i -u postgres
+  ```
 - Login 
-```bash
-psql
-```
+  ```bash
+  psql
+  ```
 - Syntax PostgresSQL
   - `\l`: liet ke cac co so du lieu 
   - `\c testdb`: ket noi vao csdl testdb
@@ -106,6 +106,7 @@ psql
     SELECT * FROM tablename;
     SELECT name, age FROM tablename WHERE age > 20;
     ```
+  ---
   - Query nâng cao
     ```sql
     -- Sắp xếp
@@ -123,6 +124,7 @@ psql
     FROM customers a
     JOIN orders b ON a.id = b.customer_id;
     ```
+  ---
   - Transaction
     ```sql
     BEGIN;                     -- bắt đầu transaction
