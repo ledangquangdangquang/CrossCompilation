@@ -27,3 +27,28 @@ cmake ../src/qtbase-everywhere-src-6.5.1/ -GNinja -DCMAKE_BUILD_TYPE=Release -DI
 cmake --build . --parallel 8
 cmake --install .
 ```
+
+---
+## Postgre manual
+
+### Install
+```bash
+sudo apt install postgresql postgresql-contrib
+```
+- `postgresql`: main app
+- `postgresql-contrib`: extension
+
+### Login 
+- Switch user
+```bash
+sudo -i -u postgres
+```
+- Login 
+```bash
+psql
+```
+- Syntax
+  - `\l`: liet ke cac co so du lieu 
+  - `\c testdb`: ket noi vao csdl testdb
+  - `\q`: quit
+  - `\lu`: liet ke cac user
