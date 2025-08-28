@@ -1,10 +1,10 @@
 # 📡 Message Queuing Telemetry Transport (MQTT) với Raspberry Pi & Ubuntu (EC2 AWS)
 
-## 🚀 Cài đặt
+## 🚀 Install 
 
 ### 🐧 Raspberry Pi
 
-Cài **Mosquitto** và **mosquitto-clients**:
+Install **Mosquitto** and **mosquitto-clients**:
 
 ```bash
 sudo apt update
@@ -15,7 +15,7 @@ sudo apt install mosquitto mosquitto-clients
 
 ### ☁️ Ubuntu EC2 (Broker)
 
-1. Cài **Mosquitto** và **mosquitto-clients**:
+1. Install **Mosquitto** and **mosquitto-clients**:
 
 ```bash
 sudo apt update
@@ -24,41 +24,53 @@ sudo systemctl enable mosquitto
 sudo systemctl start mosquitto
 ```
 
-2. Kiểm tra Mosquitto có lắng nghe trên cổng **1883**:
+2. Check Mosquitto have listening in port **1883**:
 
 ```bash
 sudo ss -tulnp | grep 1883
 ```
 
-👉 Nếu thấy `0.0.0.0:1883` thì OK.
+👉 Expected `0.0.0.0:1883` 
 
 > [!NOTE]
-> Nếu không thấy, hãy kiểm tra **Security Groups** trên AWS và chỉnh file cấu hình.
+> If not see `0.0.0.0:1883` check **Security Groups** in AWS and edit inbound 
 
-3. Sửa file config Mosquitto (cho phép remote):
+3. Edit file config Mosquitto:
 
 ```bash
 sudo vi /etc/mosquitto/mosquitto.conf
 ```
 
-Thêm:
+Add:
 
 ```
 listener 1883
 allow_anonymous true
 ```
 
-Khởi động lại:
+Restart mqtt:
 
 ```bash
 sudo systemctl restart mosquitto
 ```
 
+4 Test mqtt
+* **Ubuntu (broker)**:
+
+```bash
+mosquitto_sub -h 0.0.0.0 -p 1883 -t "pi/to/ubuntu"
+```
+
+* **Pi (client)**:
+
+```bash
+mosquitto_pub -h <Ubuntu-IP> -p 1883 -t "pi/to/ubuntu" -m "Hello Ubuntu"
+```
 ---
 
 ## 🔧 Build Qt MQTT
 
-### 1. Clone source (trên Ubuntu)
+### 1. Clone source (Ubuntu)
 
 ```bash
 cd ~/qt6/src
@@ -71,7 +83,7 @@ git checkout 6.5
 
 ### 2. Build module
 
-#### 🖥️ Build cho host (Ubuntu)
+#### 🖥️ Build for host (Ubuntu)
 
 ```bash
 cd $HOME/qt6/host-build
@@ -85,7 +97,7 @@ cmake --build . --parallel 8
 cmake --install .
 ```
 
-#### 🍓 Build cho Raspberry Pi
+#### 🍓 Build for Raspberry Pi
 
 ```bash
 cd $HOME/qt6/pi-build
@@ -104,7 +116,7 @@ cmake --install .
 
 ---
 
-### 3. Copy binary sang Pi
+### 3. Copy binary to Pi
 
 ```bash
 rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/lib rpi-sysroot/usr/local 
@@ -113,7 +125,7 @@ rsync -avz --rsync-path="sudo rsync" pi@192.168.30.77:/usr/local/include rpi-sys
 
 ---
 
-## 📄 CMakeLists.txt (ví dụ project dùng Qt MQTT)
+## 📄 CMakeLists.txt (project use Qt MQTT)
 
 ```cmake
 cmake_minimum_required(VERSION 3.5)
@@ -148,20 +160,3 @@ install(TARGETS testMQTTRPI
 )
 ```
 
----
-
-👉 Sau khi xong, bạn có thể chạy thử:
-
-* **Trên Ubuntu (broker)**:
-
-```bash
-mosquitto_sub -h 0.0.0.0 -p 1883 -t "pi/to/ubuntu"
-```
-
-* **Trên Pi (client)**:
-
-```bash
-mosquitto_pub -h <Ubuntu-IP> -p 1883 -t "pi/to/ubuntu" -m "Hello Ubuntu"
-```
-
-Ngược lại, cũng pub/sub theo topic `"ubuntu/to/pi"` để giao tiếp 2 chiều.
